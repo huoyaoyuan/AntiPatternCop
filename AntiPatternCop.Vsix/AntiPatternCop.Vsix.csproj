@@ -54,6 +54,18 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AntiPatternCop.CSharp\AntiPatternCop.CSharp.csproj">
+      <Project>{726fbaac-f341-4b26-95a1-b2834d8d8683}</Project>
+      <Name>AntiPatternCop.CSharp</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
+    <ProjectReference Include="..\AntiPatternCop.VisualBasic\AntiPatternCop.VisualBasic.vbproj">
+      <Project>{50555fa4-d733-4956-aca3-7da6ff0885ac}</Project>
+      <Name>AntiPatternCop.VisualBasic</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
     <ProjectReference Include="..\AntiPatternCop\AntiPatternCop.csproj">
       <Project>{19E09F55-61C5-4BEE-BCE6-F6F42CBC254F}</Project>
       <Name>AntiPatternCop</Name>
