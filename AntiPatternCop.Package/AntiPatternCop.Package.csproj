@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>Meowtrix.AntiPatternCop</PackageId>
+    <PackageVersion>1.0.0.0</PackageVersion>
+    <Authors>huoyaoyuan</Authors>
+    <PackageLicenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</PackageLicenseUrl>
+    <PackageProjectUrl>http://PROJECT_URL_HERE_OR_DELETE_THIS_LINE</PackageProjectUrl>
+    <PackageIconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</PackageIconUrl>
+    <RepositoryUrl>http://REPOSITORY_URL_HERE_OR_DELETE_THIS_LINE</RepositoryUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Description>AntiPatternCop</Description>
+    <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
+    <Copyright>Copyright</Copyright>
+    <PackageTags>AntiPatternCop, analyzers</PackageTags>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AntiPatternCop.CSharp\AntiPatternCop.CSharp.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\AntiPatternCop.VisualBasic\AntiPatternCop.VisualBasic.vbproj" PrivateAssets="All" />
+    <ProjectReference Include="..\AntiPatternCop\AntiPatternCop.csproj" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(OutputPath)\AntiPatternCop.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(OutputPath)\AntiPatternCop.CSharp.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(OutputPath)\AntiPatternCop.dll" Pack="true" PackagePath="analyzers/dotnet/vb" Visible="false" />
+    <None Include="$(OutputPath)\AntiPatternCop.VisualBasic.dll" Pack="true" PackagePath="analyzers/dotnet/vb" Visible="false" />
+  </ItemGroup>
+
+</Project>
