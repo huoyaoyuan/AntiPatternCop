@@ -58,6 +58,23 @@ namespace AntiPatternCop.CodeFixes
 
                     context.RegisterCodeFix(codeAction, context.Diagnostics);
                 }
+
+                if (semanticModel.Compilation.GetTypeByMetadataName("System.IEquatable`1")
+                    is { TypeKind: TypeKind.Interface, IsGenericType: true } iequatable
+                    && left.Type is
+                    {
+                        TypeKind: TypeKind.TypeParameter,
+                        DeclaringSyntaxReferences: { Length: 1 } declaration
+                    } genericParameter)
+                {
+                    string title = "Add IEquatable<T> constraint";
+                    var codeAction = CodeAction.Create(
+                        title,
+                        ct => AddIEquatableConstraintAsync(context.Document.Project.Solution, declaration[0], genericParameter, iequatable, ct),
+                        equivalenceKey: title);
+
+                    context.RegisterCodeFix(codeAction, context.Diagnostics);
+                }
             }
         }
 
@@ -97,6 +114,36 @@ namespace AntiPatternCop.CodeFixes
             return await ImportAdder.AddImportsAsync(editor.GetChangedDocument(),
                 cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
+        }
+
+        private static async Task<Solution> AddIEquatableConstraintAsync(
+            Solution solution,
+            SyntaxReference genericParameterDeclaration,
+            ITypeSymbol genericParameter,
+            ITypeSymbol iequatable,
+            CancellationToken cancellationToken)
+        {
+            var declarationSyntax = genericParameterDeclaration.GetSyntax(cancellationToken);
+            var documentId = solution.GetDocumentId(declarationSyntax.SyntaxTree);
+            var document = solution.GetDocument(documentId);
+
+            var editor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
+
+            var generator = editor.Generator;
+
+            var oldDeclaration = generator.GetDeclaration(declarationSyntax);
+            editor.SetTypeConstraint(oldDeclaration,
+                genericParameter.Name,
+                SpecialTypeConstraintKind.None,
+                new[] { generator.TypeExpression(iequatable) });
+
+            var newDocument = await ImportAdder.AddImportsAsync(
+                editor.GetChangedDocument(),
+                cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return solution.WithDocumentSyntaxRoot(documentId,
+                await newDocument.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false));
         }
     }
 }

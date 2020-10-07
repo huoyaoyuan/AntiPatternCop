@@ -244,5 +244,79 @@ End Class";
                 .WithLocation(6, 18).WithLocation(6, 16);
             await VerifyVB.VerifyCodeFixAsync(source, expected, fix);
         }
+
+        [TestMethod]
+        public async Task VerifyAddConstraintCSharp()
+        {
+            string source = @"
+using System;
+
+class C
+{
+    bool M<T>(T a, T b)
+    {
+        return a.{|#1:Equals|}(b);
+    }
+}";
+            string fixedSource = @"
+using System;
+
+class C
+{
+    bool M<T>(T a, T b) where T : IEquatable<T>
+    {
+        return a.Equals(b);
+    }
+}";
+            var expected = VerifyCS.Diagnostic(AbstractEqualsObjectAnalyzer.MessageId)
+                .WithLocation(8, 18).WithLocation(8, 16);
+
+            var test = new VerifyCS.Test
+            {
+                TestCode = source,
+                FixedCode = fixedSource,
+                ExpectedDiagnostics =
+                {
+                    expected
+                },
+                CodeActionIndex = 1
+            };
+            await test.RunAsync();
+        }
+
+        [TestMethod]
+        public async Task VerifyAddConstraintVB()
+        {
+            string source = @"
+Imports System
+
+Class C
+    Function M(Of T)(a As T, B As T) As Boolean
+        Return a.{|#0:Equals(b)|}
+    End Function
+End Class";
+            string fixedSource = @"
+Imports System
+
+Class C
+    Function M(Of T As IEquatable(Of T))(a As T, B As T) As Boolean
+        Return a.Equals(b)
+    End Function
+End Class";
+            var expected = VerifyVB.Diagnostic(AbstractEqualsObjectAnalyzer.MessageId)
+                .WithLocation(6, 18).WithLocation(6, 16);
+
+            var test = new VerifyVB.Test
+            {
+                TestCode = source,
+                FixedCode = fixedSource,
+                ExpectedDiagnostics =
+                {
+                    expected
+                },
+                CodeActionIndex = 1
+            };
+            await test.RunAsync();
+        }
     }
 }
