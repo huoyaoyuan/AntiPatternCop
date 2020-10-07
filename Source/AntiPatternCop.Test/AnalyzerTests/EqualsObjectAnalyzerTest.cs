@@ -190,5 +190,59 @@ End Class";
                 .WithLocation(7, 18).WithLocation(7, 16);
             await VerifyVB.VerifyCodeFixAsync(source, expected, fix);
         }
+
+        [TestMethod]
+        public async Task VerifyImportAdderCSharp()
+        {
+            string source = @"
+using System;
+
+class C
+{
+    bool M<T>(T a, T b)
+    {
+        return a.{|#0:Equals|}(b);
+    }
+}";
+            string fix = @"
+using System;
+using System.Collections.Generic;
+
+class C
+{
+    bool M<T>(T a, T b)
+    {
+        return EqualityComparer<T>.Default.Equals(a, b);
+    }
+}";
+            var expected = VerifyCS.Diagnostic(AbstractEqualsObjectAnalyzer.MessageId)
+                .WithLocation(8, 18).WithLocation(8, 16);
+            await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
+        }
+
+        [TestMethod]
+        public async Task VerifyImportAdderVB()
+        {
+            string source = @"
+Imports System
+
+Class C
+    Function M(Of T)(a As T, B As T) As Boolean
+        Return a.{|#0:Equals(b)|}
+    End Function
+End Class";
+            string fix = @"
+Imports System
+Imports System.Collections.Generic
+
+Class C
+    Function M(Of T)(a As T, B As T) As Boolean
+        Return EqualityComparer(Of T).Default.Equals(a, b)
+    End Function
+End Class";
+            var expected = VerifyVB.Diagnostic(AbstractEqualsObjectAnalyzer.MessageId)
+                .WithLocation(6, 18).WithLocation(6, 16);
+            await VerifyVB.VerifyCodeFixAsync(source, expected, fix);
+        }
     }
 }

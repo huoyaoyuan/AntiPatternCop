@@ -94,7 +94,9 @@ namespace AntiPatternCop.CodeFixes
                 right.Syntax);
 
             editor.ReplaceNode(nodeToFix, invoke);
-            return editor.GetChangedDocument();
+            return await ImportAdder.AddImportsAsync(editor.GetChangedDocument(),
+                cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
         }
     }
 }
