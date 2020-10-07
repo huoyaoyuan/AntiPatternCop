@@ -50,7 +50,10 @@ namespace AntiPatternCop.Analyzers
             if ((invocation.TargetMethod.OverriddenMethod ?? invocation.TargetMethod).Equals(instanceEqualsMethod)
                 || invocation.TargetMethod.Equals(staticEqualsMethod))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, GetMethodName(invocation).GetLocation()));
+                context.ReportDiagnostic(
+                    Diagnostic.Create(Descriptor,
+                    GetMethodName(invocation).GetLocation(),
+                    additionalLocations: new[] { invocation.Syntax.GetLocation() }));
             }
         }
     }

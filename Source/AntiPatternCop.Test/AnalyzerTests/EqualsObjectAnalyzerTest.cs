@@ -1,10 +1,12 @@
 ﻿using System.Threading.Tasks;
 using AntiPatternCop.Analyzers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using VerifyCS = AntiPatternCop.Test.CSharpAnalyzerVerifier<
-    AntiPatternCop.Analyzers.CSharpEqualsObjectAnalyzer>;
-using VerifyVB = AntiPatternCop.Test.VisualBasicAnalyzerVerifier<
-    AntiPatternCop.Analyzers.VBEqualsObjectAnalyzer>;
+using VerifyCS = AntiPatternCop.Test.CSharpCodeFixVerifier<
+    AntiPatternCop.Analyzers.CSharpEqualsObjectAnalyzer,
+    AntiPatternCop.CodeFixes.EqualsObjectCodeFixProvider>;
+using VerifyVB = AntiPatternCop.Test.VisualBasicCodeFixVerifier<
+    AntiPatternCop.Analyzers.VBEqualsObjectAnalyzer,
+    AntiPatternCop.CodeFixes.EqualsObjectCodeFixProvider>;
 
 namespace AntiPatternCop.Test.AnalyzerTests
 {
@@ -23,7 +25,7 @@ class C
     }
 }";
             var expected = VerifyCS.Diagnostic(AbstractEqualsObjectAnalyzer.MessageId)
-                .WithLocation(6, 18);
+                .WithLocation(6, 18).WithLocation(6, 16);
             await VerifyCS.VerifyAnalyzerAsync(source, expected);
         }
 
@@ -37,7 +39,7 @@ Class C
     End Function
 End Class";
             var expected = VerifyVB.Diagnostic(AbstractEqualsObjectAnalyzer.MessageId)
-                .WithLocation(4, 18);
+                .WithLocation(4, 18).WithLocation(4, 16);
             await VerifyVB.VerifyAnalyzerAsync(source, expected);
         }
 
@@ -53,7 +55,7 @@ class C
     }
 }";
             var expected = VerifyCS.Diagnostic(AbstractEqualsObjectAnalyzer.MessageId)
-                .WithLocation(6, 18);
+                .WithLocation(6, 18).WithLocation(6, 16);
             await VerifyCS.VerifyAnalyzerAsync(source, expected);
         }
 
@@ -67,7 +69,7 @@ Class C
     End Function
 End Class";
             var expected = VerifyVB.Diagnostic(AbstractEqualsObjectAnalyzer.MessageId)
-                .WithLocation(4, 18);
+                .WithLocation(4, 18).WithLocation(4, 16);
             await VerifyVB.VerifyAnalyzerAsync(source, expected);
         }
 
@@ -83,7 +85,7 @@ class C
     }
 }";
             var expected = VerifyCS.Diagnostic(AbstractEqualsObjectAnalyzer.MessageId)
-                .WithLocation(6, 23);
+                .WithLocation(6, 23).WithLocation(6, 16);
             await VerifyCS.VerifyAnalyzerAsync(source, expected);
         }
 
@@ -99,7 +101,7 @@ class C
     }
 }";
             var expected = VerifyCS.Diagnostic(AbstractEqualsObjectAnalyzer.MessageId)
-                .WithLocation(6, 16);
+                .WithLocation(6, 16).WithLocation(6, 16);
             await VerifyCS.VerifyAnalyzerAsync(source, expected);
         }
 
@@ -131,6 +133,62 @@ class C
     }
 }";
             await VerifyCS.VerifyAnalyzerAsync(source);
+        }
+
+        [TestMethod]
+        public async Task VerifyUnconstrainedGenericCSharp()
+        {
+            string source = @"
+using System;
+using System.Collections.Generic;
+
+class C
+{
+    bool M<T>(T a, T b)
+    {
+        return a.{|#0:Equals|}(b);
+    }
+}";
+            string fix = @"
+using System;
+using System.Collections.Generic;
+
+class C
+{
+    bool M<T>(T a, T b)
+    {
+        return EqualityComparer<T>.Default.Equals(a, b);
+    }
+}";
+            var expected = VerifyCS.Diagnostic(AbstractEqualsObjectAnalyzer.MessageId)
+                .WithLocation(9, 18).WithLocation(9, 16);
+            await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
+        }
+
+        [TestMethod]
+        public async Task VerifyUnconstrainedGenericVB()
+        {
+            string source = @"
+Imports System
+Imports System.Collections.Generic
+
+Class C
+    Function M(Of T)(a As T, B As T) As Boolean
+        Return a.{|#0:Equals(b)|}
+    End Function
+End Class";
+            string fix = @"
+Imports System
+Imports System.Collections.Generic
+
+Class C
+    Function M(Of T)(a As T, B As T) As Boolean
+        Return EqualityComparer(Of T).Default.Equals(a, b)
+    End Function
+End Class";
+            var expected = VerifyVB.Diagnostic(AbstractEqualsObjectAnalyzer.MessageId)
+                .WithLocation(7, 18).WithLocation(7, 16);
+            await VerifyVB.VerifyCodeFixAsync(source, expected, fix);
         }
     }
 }
