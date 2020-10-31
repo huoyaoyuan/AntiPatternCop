@@ -47,8 +47,8 @@ namespace AntiPatternCop.Analyzers
         {
             var invocation = (IInvocationOperation)context.Operation;
 
-            if ((invocation.TargetMethod.OverriddenMethod ?? invocation.TargetMethod).Equals(instanceEqualsMethod)
-                || invocation.TargetMethod.Equals(staticEqualsMethod))
+            if (SymbolEqualityComparer.Default.Equals(invocation.TargetMethod.OverriddenMethod ?? invocation.TargetMethod, instanceEqualsMethod)
+                || SymbolEqualityComparer.Default.Equals(invocation.TargetMethod, staticEqualsMethod))
             {
                 context.ReportDiagnostic(
                     Diagnostic.Create(Descriptor,

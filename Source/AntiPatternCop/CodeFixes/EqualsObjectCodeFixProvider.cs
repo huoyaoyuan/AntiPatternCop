@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Operations;
+using Microsoft.CodeAnalysis.Simplification;
 
 namespace AntiPatternCop.CodeFixes
 {
@@ -110,10 +111,8 @@ namespace AntiPatternCop.CodeFixes
                 left.Syntax,
                 right.Syntax);
 
-            editor.ReplaceNode(nodeToFix, invoke);
-            return await ImportAdder.AddImportsAsync(editor.GetChangedDocument(),
-                cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
+            editor.ReplaceNode(nodeToFix, invoke.WithAdditionalAnnotations(Simplifier.AddImportsAnnotation));
+            return editor.GetChangedDocument();
         }
 
         private static async Task<Solution> AddIEquatableConstraintAsync(
@@ -125,9 +124,10 @@ namespace AntiPatternCop.CodeFixes
         {
             var declarationSyntax = genericParameterDeclaration.GetSyntax(cancellationToken);
             var documentId = solution.GetDocumentId(declarationSyntax.SyntaxTree);
-            var document = solution.GetDocument(documentId);
 
-            var editor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
+            var solutionEditor = new SolutionEditor(solution);
+
+            var editor = await solutionEditor.GetDocumentEditorAsync(documentId, cancellationToken).ConfigureAwait(false);
 
             var generator = editor.Generator;
 
@@ -135,15 +135,10 @@ namespace AntiPatternCop.CodeFixes
             editor.SetTypeConstraint(oldDeclaration,
                 genericParameter.Name,
                 SpecialTypeConstraintKind.None,
-                new[] { generator.TypeExpression(iequatable) });
+                new[] { generator.TypeExpression(iequatable)
+                    .WithAdditionalAnnotations(Simplifier.AddImportsAnnotation) });
 
-            var newDocument = await ImportAdder.AddImportsAsync(
-                editor.GetChangedDocument(),
-                cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
-
-            return solution.WithDocumentSyntaxRoot(documentId,
-                await newDocument.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false));
+            return solutionEditor.GetChangedSolution();
         }
     }
 }
