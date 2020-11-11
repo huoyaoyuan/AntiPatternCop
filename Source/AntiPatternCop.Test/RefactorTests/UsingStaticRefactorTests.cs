@@ -1,14 +1,14 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using VerifyCS = AntiPatternCop.Test.CSharpCodeRefactoringVerifier<
     AntiPatternCop.Refactors.CSharpUsingStaticRefactorProvider>;
 
 namespace AntiPatternCop.Test.RefactorTests
 {
-    [TestClass]
+
     public class UsingStaticRefactorTests
     {
-        [TestMethod]
+        [Fact]
         public async Task Test1()
         {
             string initial = @"
@@ -37,7 +37,7 @@ class C
             await VerifyCS.VerifyRefactoringAsync(initial, expected);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Test2()
         {
             string initial =
@@ -63,7 +63,7 @@ class C
             await VerifyCS.VerifyRefactoringAsync(initial, expected);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Test3()
         {
             string initial =

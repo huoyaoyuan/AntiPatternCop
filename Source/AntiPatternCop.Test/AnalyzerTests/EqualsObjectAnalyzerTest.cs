@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using AntiPatternCop.Analyzers;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using VerifyCS = AntiPatternCop.Test.CSharpCodeFixVerifier<
     AntiPatternCop.Analyzers.CSharpEqualsObjectAnalyzer,
     AntiPatternCop.CodeFixes.EqualsObjectCodeFixProvider>;
@@ -10,10 +10,9 @@ using VerifyVB = AntiPatternCop.Test.VisualBasicCodeFixVerifier<
 
 namespace AntiPatternCop.Test.AnalyzerTests
 {
-    [TestClass]
     public class EqualsObjectAnalyzerTest
     {
-        [TestMethod]
+        [Fact]
         public async Task VerifySimpleCSharp()
         {
             string source = @"
@@ -29,7 +28,7 @@ class C
             await VerifyCS.VerifyAnalyzerAsync(source, expected);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task VeryfiSimpleVB()
         {
             string source = @"
@@ -43,7 +42,7 @@ End Class";
             await VerifyVB.VerifyAnalyzerAsync(source, expected);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task VerifyOverrideCSharp()
         {
             string source = @"
@@ -59,7 +58,7 @@ class C
             await VerifyCS.VerifyAnalyzerAsync(source, expected);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task VeryfiOverrideVB()
         {
             string source = @"
@@ -73,7 +72,7 @@ End Class";
             await VerifyVB.VerifyAnalyzerAsync(source, expected);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task VerifyStaticCSharp()
         {
             string source = @"
@@ -89,7 +88,7 @@ class C
             await VerifyCS.VerifyAnalyzerAsync(source, expected);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task VerifyStaticImplicitCSharp()
         {
             string source = @"
@@ -105,7 +104,7 @@ class C
             await VerifyCS.VerifyAnalyzerAsync(source, expected);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task VerifyNotOnStrongTyle()
         {
             string source = @"
@@ -119,7 +118,7 @@ class C
             await VerifyCS.VerifyAnalyzerAsync(source);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task VerifyNotOnIEquatable()
         {
             string source = @"
@@ -135,7 +134,7 @@ class C
             await VerifyCS.VerifyAnalyzerAsync(source);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task VerifyUnconstrainedGenericCSharp()
         {
             string source = @"
@@ -165,7 +164,7 @@ class C
             await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task VerifyUnconstrainedGenericVB()
         {
             string source = @"
@@ -191,7 +190,7 @@ End Class";
             await VerifyVB.VerifyCodeFixAsync(source, expected, fix);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task VerifyImportAdderCSharp()
         {
             string source = @"
@@ -220,7 +219,7 @@ class C
             await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task VerifyImportAdderVB()
         {
             string source = @"
@@ -245,7 +244,7 @@ End Class";
             await VerifyVB.VerifyCodeFixAsync(source, expected, fix);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task VerifyAddConstraintCSharp()
         {
             string source = @"
@@ -284,7 +283,7 @@ class C
             await test.RunAsync();
         }
 
-        [TestMethod]
+        [Fact]
         public async Task VerifyAddConstraintVB()
         {
             string source = @"
