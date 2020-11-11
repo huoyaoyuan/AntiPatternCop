@@ -62,5 +62,45 @@ class C
 ";
             await VerifyCS.VerifyRefactoringAsync(initial, expected);
         }
+
+        [TestMethod]
+        public async Task Test3()
+        {
+            string initial =
+@"class A
+{
+    public class B
+    {
+    }
+}
+
+class C
+{
+    void M()
+    {
+        A.[|B|] obj;
+    }
+}
+";
+            string expected =
+@"using static A;
+
+class A
+{
+    public class B
+    {
+    }
+}
+
+class C
+{
+    void M()
+    {
+        B obj;
+    }
+}
+";
+            await VerifyCS.VerifyRefactoringAsync(initial, expected);
+        }
     }
 }
