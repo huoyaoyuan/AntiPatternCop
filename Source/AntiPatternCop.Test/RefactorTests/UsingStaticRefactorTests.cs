@@ -36,5 +36,31 @@ class C
 ";
             await VerifyCS.VerifyRefactoringAsync(initial, expected);
         }
+
+        [TestMethod]
+        public async Task Test2()
+        {
+            string initial =
+@"class C
+{
+    void M()
+    {
+        System.Console.[|WriteLine|](""abc"");
+    }
+}
+";
+            string expected =
+@"using static System.Console;
+
+class C
+{
+    void M()
+    {
+        WriteLine(""abc"");
+    }
+}
+";
+            await VerifyCS.VerifyRefactoringAsync(initial, expected);
+        }
     }
 }

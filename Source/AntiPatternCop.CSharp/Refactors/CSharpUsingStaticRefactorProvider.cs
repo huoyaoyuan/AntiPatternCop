@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.CodeRefactorings;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
+using Microsoft.CodeAnalysis.Simplification;
 
 namespace AntiPatternCop.Refactors
 {
@@ -21,8 +22,6 @@ namespace AntiPatternCop.Refactors
             var symbolInfo = semanticModel.GetSymbolInfo(node, context.CancellationToken);
             var expressionSymbolInfo = semanticModel.GetSymbolInfo(node.Expression, context.CancellationToken);
 
-            var usings = node.FirstAncestorOrSelf<CompilationUnitSyntax>().Usings;
-
             if (symbolInfo.Symbol is { IsStatic: true } && expressionSymbolInfo.Symbol is INamedTypeSymbol namedType)
             {
                 context.RegisterRefactoring(CodeAction.Create(
@@ -33,10 +32,11 @@ namespace AntiPatternCop.Refactors
                         var generator = editor.Generator;
                         var usingStatic = SyntaxFactory.UsingDirective(SyntaxFactory.Token(SyntaxKind.StaticKeyword), null, (NameSyntax)generator.TypeExpression(namedType));
 
-                        editor.InsertAfter(usings.Last(), usingStatic);
-                        editor.ReplaceNode(node, node.Name.WithTriviaFrom(node));
+                        editor.ReplaceNode(node, node.WithAdditionalAnnotations(Simplifier.Annotation));
 
-                        return editor.GetChangedDocument();
+                        var changed = (CompilationUnitSyntax)editor.GetChangedRoot();
+                        changed = changed.AddUsings(usingStatic);
+                        return document.WithSyntaxRoot(changed);
                     }));
             }
         }
